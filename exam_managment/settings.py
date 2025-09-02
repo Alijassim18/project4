@@ -75,8 +75,8 @@ WSGI_APPLICATION = 'exam_managment.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-         'NAME': 'exams',  # Name of your PostgreSQL database
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'exams',  # Name of your PostgreSQL database
         'USER': 'postgres',
         'PASSWORD': 'Aqw123456.?',
         'HOST': 'localhost',  
@@ -84,6 +84,8 @@ DATABASES = {
 
     }
 }
+AUTH_USER_MODEL = "main_app.User"
+
 
 
 # Password validation
