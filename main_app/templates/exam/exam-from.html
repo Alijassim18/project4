@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block body %}
+    {% if exam %}
+        <h1>Update {{ exam.title }}</h1>
+    {% else %}
+        <h1>Create a New Exam</h1>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <p>
+            <label for="title">Title:</label><br>
+            <input type="text" name="title" id="title" value="{{ exam.title|default:'' }}" required>
+        </p>
+
+        <p>
+            <label for="type">Type:</label><br>
+            <select name="type" id="type" required>
+                <option value="MHQ" {% if exam and exam.type == "MHQ" %}selected{% endif %}>MHQ</option>
+                <option value="true_false" {% if exam and exam.type == "true_false" %}selected{% endif %}>True/False</option>
+                <option value="essay" {% if exam and exam.type == "essay" %}selected{% endif %}>Essay</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="question_text">Question Text:</label><br>
+            <textarea name="question_text" id="question_text" rows="4" cols="40" required>{{ exam.question_text|default:'' }}</textarea>
+        </p>
+
+       
+        <div id="choices-container"></div>
+
+        <p>
+            <label for="start_date">Start Date:</label><br>
+            <input type="datetime-local" name="start_date" id="start_date" value="{{ exam.start_date|date:'Y-m-d\\TH:i' }}" required>
+        </p>
+
+        <p>
+            <label for="end_date">End Date:</label><br>
+            <input type="datetime-local" name="end_date" id="end_date" value="{{ exam.end_date|date:'Y-m-d\\TH:i' }}" required>
+        </p>
+
+        <p>
+            <label for="timer">Timer (minutes):</label><br>
+            <input type="number" name="timer" id="timer" value="{{ exam.timer|default:'' }}" required>
+        </p>
+
+        <p>
+            <label for="point">Points:</label><br>
+            <input type="number" name="point" id="point" value="{{ exam.point|default:'' }}" required>
+        </p>
+
+        <button type="submit">Save Exam</button>
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const typeSelect = document.getElementById("type");
+            const choicesContainer = document.getElementById("choices-container");
+
+            function renderChoices() {
+                const type = typeSelect.value;
+                choicesContainer.innerHTML = "";
+
+                if (type === "MHQ") {
+                    for (let i = 1; i <= 4; i++) {
+                        choicesContainer.innerHTML += `
+                            <p>
+                                Choice ${i}: <input type="text" name="choice_${i}">
+                                Correct? <input type="checkbox" name="correct_${i}">
+                            </p>
+                        `;
+                    }
+                } else if (type === "true_false") {
+                    ["True", "False"].forEach((val, i) => {
+                        choicesContainer.innerHTML += `
+                            <p>
+                                ${val}: 
+                                <input type="hidden" name="choice_${i+1}" value="${val}">
+                                Correct? <input type="checkbox" name="correct_${i+1}">
+                            </p>
+                        `;
+                    });
+                } else if (type === "essay") {
+                    choicesContainer.innerHTML = `
+                        <p>
+                            Answer:<br>
+                            <textarea name="answer" rows="4" cols="40"></textarea>
+                        </p>
+                    `;
+                }
+            }
+
+            typeSelect.addEventListener("change", renderChoices);
+            renderChoices();
+        });
+    </script>
+{% endblock %}

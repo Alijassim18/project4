@@ -5,32 +5,37 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     class Role(models.TextChoices):
         ADMIN = "admin", "Admin" # value saved in db, value shown to the user
-        Student = "student","Student"
+        STUDENT = "student","Student"
 
     role = models.CharField(
         max_length=20,
         choices=Role.choices,
-        # default=Role.CUSTOMER,
+         default=Role.ADMIN,
         null=True
     )
     class Meta:
-        db_table='user'
+        db_table='users'
 
 class Exam(models.Model):
+    class Choose(models.TextChoices):
+     MHQ = "MHQ", "MHQ" 
+     TRUEORFALSE = "true/false","true/flase"
+     essay='essay','Essay'
     title = models.CharField(max_length=200)
+    type=models.CharField(max_length=20,choices=Choose.choices,default=Choose.MHQ)
+    question_text = models.TextField()
+    answer = models.TextField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     timer = models.IntegerField()
-    grade = models.IntegerField()
+    point = models.IntegerField()
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         db_table='exam'
 
 class Question(models.Model):
-    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
-    question_text = models.TextField()
-    answer = models.TextField()
+ 
 
     class Meta:
         db_table='questions'
